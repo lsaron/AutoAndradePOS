@@ -7,7 +7,7 @@ router = APIRouter()
 
 @router.get("/detalle_gastos/{id_trabajo}")
 def obtener_gastos_por_trabajo(id_trabajo: int, db: Session = Depends(get_db)):
-    from app.schemas.detalle_gastos import DetalleGastoSchema  # 👈 Mover import aquí
+    from app.schemas.detalle_gastos import DetalleGastoSchema  
 
     detalles = db.query(DetalleGasto).filter(DetalleGasto.id_trabajo == id_trabajo).all()
     if not detalles:

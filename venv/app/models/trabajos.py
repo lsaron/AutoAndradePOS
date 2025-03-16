@@ -12,5 +12,10 @@ class Trabajo(Base):
     fecha = Column(DateTime, default=datetime.utcnow)
     costo = Column(Integer)
 
+    # Relación con Carro
     carro = relationship("Carro", back_populates="trabajos")
-detalle_gastos = relationship("DetalleGasto", back_populates="trabajo")
+
+    # Relación con Detalles de Gastos
+    detalles_gastos = relationship("DetalleGasto", back_populates="trabajo")
+
+    __table_args__ = {'extend_existing': True}  # Asegura que SQLAlchemy no intente crearla otra vez
