@@ -11,8 +11,11 @@ class Carro(Base):
     anio = Column(Integer, nullable=False)
     id_cliente_actual = Column(String(20), ForeignKey("clientes.id_nacional", ondelete="SET NULL"))
 
-    # ✅ Relación con Cliente (Cada carro tiene un dueño actual)
+    # ✅ Relación con Cliente (Un carro pertenece a un cliente actual)
     cliente_actual = relationship("Cliente", back_populates="carros")
 
-    # ✅ Relación con Trabajos (Cada carro puede tener múltiples trabajos)
-    trabajos = relationship("Trabajo", back_populates="carro", cascade="all, delete-orphan")  # 👈 AGREGA ESTO
+    # ✅ Relación con Trabajos (Un carro puede tener múltiples trabajos)
+    trabajos = relationship("Trabajo", back_populates="carro", cascade="all, delete-orphan")
+
+    # ✅ Relación con Historial de Dueños (Un carro puede haber tenido múltiples dueños)
+    historial_duenos = relationship("HistorialDueno", back_populates="carro", cascade="all, delete-orphan")  # 👈 AGREGA ESTO
