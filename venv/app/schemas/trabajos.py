@@ -1,12 +1,14 @@
 from pydantic import BaseModel
+from typing import List
 from datetime import datetime
-from typing import Optional
+
+class DetalleGastoSchema(BaseModel):
+    descripcion: str
+    monto: int
 
 class TrabajoSchema(BaseModel):
-    id_carro: int
+    matricula_carro: str  # ✅ Ahora se usa la matrícula en lugar del ID
     descripcion: str
-    fecha: Optional[datetime] = None
-    costo: float
-
-    class Config:
-        orm_mode = True
+    fecha: datetime
+    costo: int
+    detalle_gastos: List[DetalleGastoSchema]  # ✅ Se incluyen los gastos

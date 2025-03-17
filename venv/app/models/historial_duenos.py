@@ -7,13 +7,13 @@ class HistorialDueno(Base):
     __tablename__ = "historial_duenos"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    id_carro = Column(String(20), ForeignKey("carros.matricula", ondelete="CASCADE"))  # ✅ Usa matrícula en lugar de ID
-    id_cliente = Column(String(20), ForeignKey("clientes.id_nacional", ondelete="SET NULL"))  # ✅ Usa id_nacional
+    matricula_carro = Column(String(20), ForeignKey("carros.matricula", ondelete="CASCADE"))  # 👈 Se usa la matrícula
+    id_cliente = Column(String(20), ForeignKey("clientes.id_nacional", ondelete="SET NULL"))
     fecha_inicio = Column(DateTime, default=datetime.utcnow)
     fecha_fin = Column(DateTime, nullable=True)
 
-    # ✅ Relación con Carro (un carro puede haber tenido varios dueños)
+    # ✅ Relación con Carro
     carro = relationship("Carro", back_populates="historial_duenos")
 
-    # ✅ Relación con Cliente (un cliente puede haber tenido varios carros)
+    # ✅ Relación con Cliente
     cliente = relationship("Cliente", back_populates="historial_duenos")

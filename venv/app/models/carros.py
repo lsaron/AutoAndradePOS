@@ -6,16 +6,14 @@ class Carro(Base):
     __tablename__ = "carros"
 
     matricula = Column(String(20), primary_key=True, unique=True, index=True)
-    marca = Column(String(50), nullable=False)
-    modelo = Column(String(50), nullable=False)
-    anio = Column(Integer, nullable=False)
+    marca = Column(String(50))
+    modelo = Column(String(50))
+    anio = Column(Integer)
     id_cliente_actual = Column(String(20), ForeignKey("clientes.id_nacional", ondelete="SET NULL"))
 
-    # ✅ Relación con Cliente (Un carro pertenece a un cliente actual)
+    # ✅ Relación con Cliente
     cliente_actual = relationship("Cliente", back_populates="carros")
+    trabajos = relationship("Trabajo", back_populates="carro", cascade="all, delete-orphan")  # 👈 Agregar esto si falta
 
-    # ✅ Relación con Trabajos (Un carro puede tener múltiples trabajos)
-    trabajos = relationship("Trabajo", back_populates="carro", cascade="all, delete-orphan")
-
-    # ✅ Relación con Historial de Dueños (Un carro puede haber tenido múltiples dueños)
-    historial_duenos = relationship("HistorialDueno", back_populates="carro", cascade="all, delete-orphan")  # 👈 AGREGA ESTO
+    # ✅ Relación con Historial de Dueños (basado en la matrícula)
+    historial_duenos = relationship("HistorialDueno", back_populates="carro", cascade="all, delete-orphan")

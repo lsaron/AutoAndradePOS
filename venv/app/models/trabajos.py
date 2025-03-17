@@ -12,8 +12,8 @@ class Trabajo(Base):
     fecha = Column(DateTime, default=datetime.utcnow)
     costo = Column(Integer, nullable=False)
 
-    # ✅ Relación con Carro (cada trabajo pertenece a un carro específico)
+    # ✅ Relación con Carro (Cada trabajo pertenece a un carro específico)
     carro = relationship("Carro", back_populates="trabajos")
 
-    # ✅ Relación con Detalles de Gastos (un trabajo puede tener múltiples gastos)
-    detalles_gastos = relationship("DetalleGasto", back_populates="trabajo", cascade="all, delete-orphan")  # 👈 AGREGA ESTO
+    # ✅ Relación con Detalles de Gastos (Cada trabajo puede tener múltiples gastos)
+    detalle_gastos = relationship("DetalleGasto", back_populates="trabajo", cascade="all, delete-orphan")
