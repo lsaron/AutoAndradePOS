@@ -5,6 +5,8 @@ from app.models.database import get_db
 from app.models.carros import Carro
 from app.models.historial_duenos import HistorialDueno
 from app.models.clientes import Cliente
+from app.models.trabajos import Trabajo  # ✅ Importación añadida
+from app.models.detalle_gastos import DetalleGasto  # ✅ Importación añadida
 from app.schemas.carros import CarroSchema
 
 router = APIRouter()
@@ -50,7 +52,6 @@ def obtener_historial_carro(matricula: str, db: Session = Depends(get_db)):
         "historial_duenos": lista_duenos  # ✅ Optimizado
     }
 
-
 # ✅ CREAR UN NUEVO CARRO
 @router.post("/carros/")
 def crear_carro(carro: CarroSchema, db: Session = Depends(get_db)):
@@ -88,3 +89,21 @@ def crear_carro(carro: CarroSchema, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(nuevo_carro)
     return {"message": "Carro creado correctamente", "carro": nuevo_carro}
+
+# ✅ ELIMINAR UN CARRO
+@router.delete("/carros/{matricula}")
+def eliminar_carro(matricula: str, db: Session = Depends(get_db)):
+    carro_db = db.query(Carro).filter(Carro.matricula == matricula).first()
+    if not carro_db:
+        raise HTTPException(status_code=404, detail="Carro no encontrado")
+
+    # ✅ Eliminar trabajos y gastos asociados al carro
+    trabajos = db.query(Trabajo).filter(Trabajo.matricula_carro == matricula).all()
+    for trabajo in trabajos:
+        db.query(DetalleGasto).filter(DetalleGasto.id_trabajo == trabajo.id).delete()
+        db.delete(trabajo)
+
+    # ✅ Eliminar el carro
+    db.delete(carro_db)
+    db.commit()
+    return {"message": "Carro eliminado correctamente"}

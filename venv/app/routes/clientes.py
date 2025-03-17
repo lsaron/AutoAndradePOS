@@ -55,3 +55,23 @@ def obtener_cliente_con_carros(id_nacional: str, db: Session = Depends(get_db)):
         "telefono": cliente.telefono,
         "carros": lista_carros
     }
+
+# ✅ ELIMINAR CLIENTE
+@router.delete("/clientes/{id_cliente}")
+def eliminar_cliente(id_cliente: str, db: Session = Depends(get_db)):
+    cliente_db = db.query(Cliente).filter(Cliente.id_nacional == id_cliente).first()
+    if not cliente_db:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+
+    # ✅ Verificar si el cliente tiene carros asociados
+    carros_asociados = db.query(Carro).filter(Carro.id_cliente_actual == id_cliente).count()
+    if carros_asociados > 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No se puede eliminar el cliente porque tiene carros asociados. Reasigne o elimine los carros primero."
+        )
+
+    # ✅ Si no tiene carros asociados, eliminar el cliente
+    db.delete(cliente_db)
+    db.commit()
+    return {"message": "Cliente eliminado correctamente"}
