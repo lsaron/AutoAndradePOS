@@ -3,18 +3,41 @@ from sqlalchemy.orm import Session
 from app.models.database import get_db
 from app.models.clientes import Cliente
 from app.models.carros import Carro
+from app.schemas.clientes import ClienteSchema, ClienteConCarrosSchema
 
 router = APIRouter()
 
-@router.get("/clientes/{id_cliente}")
-def obtener_cliente_con_carros(id_cliente: int, db: Session = Depends(get_db)):
-    # Buscar el cliente por ID
-    cliente = db.query(Cliente).filter(Cliente.id == id_cliente).first()
+# ✅ CREAR UN CLIENTE
+@router.post("/clientes/")
+def crear_cliente(cliente: ClienteSchema, db: Session = Depends(get_db)):
+    # Verificar si el cliente ya existe
+    cliente_existente = db.query(Cliente).filter(Cliente.id_nacional == cliente.id_nacional).first()
+    if cliente_existente:
+        raise HTTPException(status_code=400, detail="El cliente con este ID nacional ya existe")
+
+    # Crear nuevo cliente
+    nuevo_cliente = Cliente(
+        id_nacional=cliente.id_nacional,
+        nombre=cliente.nombre,
+        correo=cliente.correo,
+        telefono=cliente.telefono
+    )
+    db.add(nuevo_cliente)
+    db.commit()
+    db.refresh(nuevo_cliente)
+
+    return {"message": "Cliente creado correctamente", "cliente": nuevo_cliente}
+
+# ✅ OBTENER UN CLIENTE CON SUS CARROS ASOCIADOS
+@router.get("/clientes/{id_nacional}", response_model=ClienteConCarrosSchema)
+def obtener_cliente_con_carros(id_nacional: str, db: Session = Depends(get_db)):
+    # Buscar el cliente por ID Nacional
+    cliente = db.query(Cliente).filter(Cliente.id_nacional == id_nacional).first()
     if not cliente:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
     # Obtener todos los carros asociados al cliente
-    carros = db.query(Carro).filter(Carro.id_cliente_actual == id_cliente).all()
+    carros = db.query(Carro).filter(Carro.id_cliente_actual == id_nacional).all()
     lista_carros = [
         {
             "matricula": carro.matricula,
@@ -26,7 +49,7 @@ def obtener_cliente_con_carros(id_cliente: int, db: Session = Depends(get_db)):
     ]
 
     return {
-        "id": cliente.id,
+        "id_nacional": cliente.id_nacional,
         "nombre": cliente.nombre,
         "correo": cliente.correo,
         "telefono": cliente.telefono,
