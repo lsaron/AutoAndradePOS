@@ -13,7 +13,7 @@ def crear_cliente(cliente: ClienteSchema, db: Session = Depends(get_db)):
     # Verificar si el cliente ya existe
     cliente_existente = db.query(Cliente).filter(Cliente.id_nacional == cliente.id_nacional).first()
     if cliente_existente:
-        raise HTTPException(status_code=400, detail="El cliente con este ID nacional ya existe")
+        raise HTTPException(status_code=400, detail="El cliente con este cedúla ya existe")
 
     # Crear nuevo cliente
     nuevo_cliente = Cliente(
